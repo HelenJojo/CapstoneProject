@@ -13,6 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 public class Backlog {
+    //backlog pojoo
     @Id
     @GeneratedValue
     private Long id;
