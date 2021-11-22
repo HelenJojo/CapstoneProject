@@ -36,9 +36,16 @@ public class Project {
     private Date createdAt;
     @JsonFormat(pattern = "yyyy-mm-dd")
     private Date updatedAt;
+
     @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "project")
     @JsonIgnore
     private Backlog backlog;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
+
+    private String projectLeader;
 
     @PrePersist
     protected void onCreate() {
@@ -49,6 +56,8 @@ public class Project {
     protected void onUpdate() {
         this.updatedAt = new Date();
     }
+
+
 
     @Override
     public String toString() {
