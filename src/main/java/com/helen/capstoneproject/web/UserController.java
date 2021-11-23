@@ -24,11 +24,13 @@ import javax.validation.Valid;
 
 import static com.helen.capstoneproject.security.SecurityConstants.TOKEN_PREFIX;
 
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
+
     @Autowired
-    private MapValidationError mapValidationError;
+    private MapValidationError mapValidationErrorService;
 
     @Autowired
     private UserService userService;
@@ -37,14 +39,16 @@ public class UserController {
     private UserValidator userValidator;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtTokenProvider tokenProvider;
 
     @Autowired
     private AuthenticationManager authenticationManager;
 
+
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result){
-        ResponseEntity<?> errorMap = mapValidationError.MapValidationService(result);
+        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
         if(errorMap != null) return errorMap;
 
         Authentication authentication = authenticationManager.authenticate(
@@ -55,20 +59,21 @@ public class UserController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = TOKEN_PREFIX + jwtTokenProvider.generateToken(authentication) ;
+        String jwt = TOKEN_PREFIX +  tokenProvider.generateToken(authentication);
 
         return ResponseEntity.ok(new JWTLoginSuccessResponse(true, jwt));
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result){
         // Validate passwords match
         userValidator.validate(user,result);
-        ResponseEntity<?> errorMap = mapValidationError.MapValidationService(result);
-        if (errorMap != null) return errorMap;
+
+        ResponseEntity<?> errorMap = mapValidationErrorService.MapValidationService(result);
+        if(errorMap != null)return errorMap;
 
         User newUser = userService.saveUser(user);
 
-        return new ResponseEntity<User>(newUser, HttpStatus.CREATED);
+        return  new ResponseEntity<User>(newUser, HttpStatus.CREATED);
     }
 }

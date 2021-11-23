@@ -20,8 +20,9 @@ import static com.helen.capstoneproject.security.SecurityConstants.SIGN_UP_URLS;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true,jsr250Enabled = true,prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter{
+@EnableGlobalMethodSecurity(securedEnabled = true,jsr250Enabled = true,prePostEnabled = true)//security for role based login
+public class SecurityConfig extends WebSecurityConfigurerAdapter//provides default security configs(customise those configs by overiding methods)
+{
 
     @Autowired
     private JwtAuthenticationEntryPoint unauthorizedHandler;
@@ -45,13 +46,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
+                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()//handles what exception needs to be thrown whenever someone is not authenticated
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)//restapi(instead we use jwt)
                 .and()
                 .headers().frameOptions().sameOrigin() //To enable H2 Database
                 .and()

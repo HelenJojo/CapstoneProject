@@ -24,11 +24,12 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Email(message = "USername needs to be email")
-    @NotBlank(message = "Username is required")
+
+    @Email(message = "Username needs to be an email")
+    @NotBlank(message = "username is required")
     @Column(unique = true)
     private String username;
-    @NotBlank(message = "Enter your full name")
+    @NotBlank(message = "Please enter your full name")
     private String fullName;
     @NotBlank(message = "Password field is required")
     private String password;
@@ -40,14 +41,15 @@ public class User implements UserDetails {
     protected void onCreate(){
         this.create_At = new Date();
     }
+
     @PreUpdate
     protected void onUpdate(){
         this.update_At = new Date();
     }
-
-    //onetomanny with project
+    //OneToMany with Project
     @OneToMany(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER, mappedBy = "user", orphanRemoval = true)
     private List<Project> projects = new ArrayList<>();
+
 
     //userdetails interface methods
     @Override
@@ -79,9 +81,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-
-
-
 
 }

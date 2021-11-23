@@ -19,28 +19,30 @@ import java.util.Collections;
 import static com.helen.capstoneproject.security.SecurityConstants.HEADER_STRING;
 import static com.helen.capstoneproject.security.SecurityConstants.TOKEN_PREFIX;
 
-
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    private JwtTokenProvider tokenProvider;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
+                                    FilterChain filterChain) throws ServletException, IOException {
+
         try {
 
-            String jwt = getJWTFromRequest(request);
+            String jwt = getJWTFromRequest(httpServletRequest);
 
-            if(StringUtils.hasText(jwt)&& jwtTokenProvider.validateToken(jwt)){
-                Long userId = jwtTokenProvider.getUserIdFromJWT(jwt);
+            if(StringUtils.hasText(jwt)&& tokenProvider.validateToken(jwt)){
+                Long userId = tokenProvider.getUserIdFromJWT(jwt);
                 User userDetails = customUserDetailsService.loadUserById(userId);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, Collections.emptyList());
 
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             }
@@ -50,8 +52,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
 
-        filterChain.doFilter(request, response);
+        filterChain.doFilter(httpServletRequest, httpServletResponse);
+
     }
+
+
+
     private String getJWTFromRequest(HttpServletRequest request){
         String bearerToken = request.getHeader(HEADER_STRING);
 
