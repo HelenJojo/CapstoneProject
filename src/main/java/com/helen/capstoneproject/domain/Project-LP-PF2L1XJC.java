@@ -1,11 +1,19 @@
 package com.helen.capstoneproject.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Date;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity
 public class Project {
     @Id
@@ -24,82 +32,32 @@ public class Project {
     @JsonFormat(pattern = "yyyy-mm-dd")
     private Date end_date;
     @JsonFormat(pattern = "yyyy-mm-dd")
+    @Column(updatable = false)
     private Date createdAt;
     @JsonFormat(pattern = "yyyy-mm-dd")
     private Date updatedAt;
+
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "project")
+    @JsonIgnore
+    private Backlog backlog;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
+
+    private String projectLeader;
 
     @PrePersist
     protected void onCreate() {
         this.createdAt = new Date();
     }
 
-    public Long getId() {
-        return id;
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Date();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public String getProjectName() {
-        return projectName;
-    }
-
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    public String getProjectIdentifier() {
-        return projectIdentifier;
-    }
-
-    public void setProjectIdentifier(String projectIdentifier) {
-        this.projectIdentifier = projectIdentifier;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getStart_date() {
-        return start_date;
-    }
-
-    public void setStart_date(Date start_date) {
-        this.start_date = start_date;
-    }
-
-    public Date getEnd_date() {
-        return end_date;
-    }
-
-    public void setEnd_date(Date end_date) {
-        this.end_date = end_date;
-    }
-
-    public Date getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Date getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Date updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Project() {
-
-    }
 
     @Override
     public String toString() {
@@ -113,13 +71,6 @@ public class Project {
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = new Date();
-
-
     }
 
 
